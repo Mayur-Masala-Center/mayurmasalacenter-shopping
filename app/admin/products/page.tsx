@@ -98,8 +98,14 @@ function ProductsAdmin() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.name.trim() || !form.price) {
-      alert("Name and price are required.");
+    if (
+      !form.name.trim() ||
+      !form.description.trim() ||
+      !form.price ||
+      !form.mrp.trim() ||
+      !form.sizes.trim()
+    ) {
+      alert("Name, description, MRP, MM Special Price, and Sizes are all required.");
       return;
     }
     setSaving(true);
@@ -151,7 +157,7 @@ function ProductsAdmin() {
       name: form.name.trim(),
       description: form.description.trim() || null,
       price: parseFloat(form.price),
-      mrp: form.mrp.trim() ? parseFloat(form.mrp) : null,
+      mrp: parseFloat(form.mrp),
       sizes: sizesArray,
       category: form.category.trim() || "General",
       active: form.active,
@@ -208,11 +214,14 @@ function ProductsAdmin() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-tamarind-900 mb-1">Description</label>
+            <label className="block text-sm font-semibold text-tamarind-900 mb-1">
+              Description <span className="text-vermillion-500">*</span>
+            </label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
+              required
               className="w-full border border-tamarind-900/20 rounded-xl px-3 py-2 bg-white"
               placeholder="Short description shown to customers"
             />
@@ -220,23 +229,26 @@ function ProductsAdmin() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-semibold text-tamarind-900 mb-1">MRP (₹)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={form.mrp}
-                onChange={(e) => setForm({ ...form, mrp: e.target.value })}
-                className="w-full border border-tamarind-900/20 rounded-xl px-3 py-2 bg-white"
-                placeholder="Optional"
-              />
-            </div>
-            <div>
               <label className="block text-sm font-semibold text-tamarind-900 mb-1">
-                MM Special Price (₹)
+                MRP (₹) <span className="text-vermillion-500">*</span>
               </label>
               <input
                 type="number"
                 step="0.01"
+                required
+                value={form.mrp}
+                onChange={(e) => setForm({ ...form, mrp: e.target.value })}
+                className="w-full border border-tamarind-900/20 rounded-xl px-3 py-2 bg-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-tamarind-900 mb-1">
+                MM Special Price (₹) <span className="text-vermillion-500">*</span>
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                required
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
                 className="w-full border border-tamarind-900/20 rounded-xl px-3 py-2 bg-white"
@@ -256,9 +268,11 @@ function ProductsAdmin() {
 
           <div>
             <label className="block text-sm font-semibold text-tamarind-900 mb-1">
-              Sizes <span className="font-normal text-tamarind-800/50">(comma-separated, optional)</span>
+              Sizes <span className="text-vermillion-500">*</span>{" "}
+              <span className="font-normal text-tamarind-800/50">(comma-separated)</span>
             </label>
             <input
+              required
               value={form.sizes}
               onChange={(e) => setForm({ ...form, sizes: e.target.value })}
               className="w-full border border-tamarind-900/20 rounded-xl px-3 py-2 bg-white"
@@ -377,16 +391,7 @@ function ProductsAdmin() {
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-tamarind-900 text-sm truncate">{product.name}</p>
                     <p className="text-xs text-tamarind-800/60">
-                      {product.mrp && product.mrp > product.price ? (
-                        <>
-                          <span className="line-through mr-1">₹{product.mrp}</span>
-                          <span className="text-vermillion-500 font-semibold">₹{product.price}</span>
-                        </>
-                      ) : (
-                        <>₹{product.price}</>
-                      )}
-                      {" · "}
-                      {product.category}
+                      MRP ₹{product.mrp} · Special ₹{product.price} · {product.category}
                     </p>
                     <div className="flex gap-2 mt-2">
                       <button

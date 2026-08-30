@@ -29,8 +29,8 @@ export default async function HomePage() {
 
       {/* HERO */}
       <section className="relative overflow-hidden bg-diya-glow bg-tamarind-900 text-cream">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28 grid gap-10 items-center md:grid-cols-2">
-          <div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-28">
+          <div className="max-w-2xl">
             <span className="inline-block text-xs font-semibold tracking-widest uppercase text-turmeric-300 border border-turmeric-300/40 rounded-full px-3 py-1 mb-5">
               Est. 1992 · Pimpri
             </span>
@@ -56,10 +56,6 @@ export default async function HomePage() {
                 Our Story
               </a>
             </div>
-          </div>
-
-          <div className="relative aspect-square rounded-3xl bg-gradient-to-br from-turmeric-500/20 to-vermillion-500/20 border border-turmeric-300/20 flex items-center justify-center text-8xl">
-            🪔🌶️
           </div>
         </div>
       </section>

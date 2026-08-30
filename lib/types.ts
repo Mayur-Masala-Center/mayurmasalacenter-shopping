@@ -10,10 +10,10 @@ export interface Product {
   name: string;
   description: string | null;
   price: number; // actual selling price ("MM Special Price")
-  mrp: number | null; // optional strikethrough reference price
+  mrp: number; // MRP shown alongside the selling price
   image_url: string | null; // primary/cover photo
   image_urls: string[]; // additional gallery photos
-  sizes: string[]; // optional size/variant tags, informational only
+  sizes: string[]; // available sizes/variants
   category: string | null;
   active: boolean;
   created_at?: string;

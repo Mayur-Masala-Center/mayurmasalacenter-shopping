@@ -16,8 +16,6 @@ export default function ProductCard({ product }: { product: Product }) {
   const [activePhoto, setActivePhoto] = useState(0);
   const currentImage = allPhotos[activePhoto] || null;
 
-  const hasDiscount = product.mrp != null && product.mrp > product.price;
-
   return (
     <div className="group bg-white/70 border border-turmeric-300/40 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow flex flex-col">
       <div className="relative aspect-square bg-turmeric-50">
@@ -84,16 +82,18 @@ export default function ProductCard({ product }: { product: Product }) {
             ))}
           </div>
         )}
-        <div className="mt-auto pt-3 flex items-center justify-between">
-          <span className="flex items-baseline gap-1.5">
-            {hasDiscount && (
-              <span className="text-xs text-tamarind-800/40 line-through">₹{product.mrp}</span>
-            )}
-            <span className="font-display text-lg text-vermillion-500">₹{product.price}</span>
-          </span>
+        <div className="mt-auto pt-3">
+          <div className="text-xs text-tamarind-800/60 leading-snug">
+            <div>
+              MRP - <span className="line-through">₹{product.mrp}</span>
+            </div>
+            <div className="font-display text-base text-vermillion-500">
+              MM Special Price - ₹{product.price}
+            </div>
+          </div>
           <button
             onClick={() => addItem(product)}
-            className="text-xs font-semibold bg-vermillion-500 hover:bg-vermillion-400 text-cream px-3 py-2 rounded-full transition-colors"
+            className="mt-2 w-full text-xs font-semibold bg-vermillion-500 hover:bg-vermillion-400 text-cream px-3 py-2 rounded-full transition-colors"
           >
             Add to Cart
           </button>
