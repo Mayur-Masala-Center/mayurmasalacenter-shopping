@@ -103,9 +103,9 @@ export async function POST(req: NextRequest) {
     // degrade gracefully instead. (The DB trigger from migration 010 also
     // independently recomputes delivery_charge/total server-side, so pricing
     // integrity doesn't depend on this succeeding.)
-    let admin: ReturnType<typeof supabaseAdmin> | null = null;
+    let admin: Awaited<ReturnType<typeof supabaseAdmin>> | null = null;
     try {
-      admin = supabaseAdmin();
+      admin = await supabaseAdmin();
     } catch (adminInitErr) {
       console.error(
         "supabaseAdmin unavailable — SUPABASE_SERVICE_ROLE_KEY is likely missing from this deployment's env vars",

@@ -29,9 +29,9 @@
   // NEXT_PUBLIC_SUPABASE_ANON_KEY is safe to commit: it's already shipped
   // to every browser via the client bundle, so it isn't a secret.
   //
-  // SUPABASE_SERVICE_ROLE_KEY must NOT go here — it stays a real secret,
-  // set with `npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY`, which
-  // persists independently of this file and is never committed to git.
+  // SUPABASE_SERVICE_ROLE_KEY is NOT set here — it now lives in the
+  // Cloudflare Secrets Store (see secrets_store_secrets below) instead of
+  // as a plain Worker var/secret.
   "vars": {
     "NEXT_PUBLIC_SUPABASE_URL": "https://deushocizdaglyjpflsi.supabase.co",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRldXNob2NpemRhZ2x5anBmbHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNzE4OTcsImV4cCI6MjA5ODc0Nzg5N30.T-F2maZxRjdEum9LrNTpz6DaRhlV3D4TK3CEcNUvu60",
@@ -39,6 +39,18 @@
     "NEXT_PUBLIC_SHOP_NAME": "Mayur Masala and Pooja Center",
     "NEXT_PUBLIC_SHOP_ADDRESS": "Shagun Chowk, Pimpri, Pune, Maharashtra",
     "NEXT_PUBLIC_SHOP_PHONE": "9225350448",
-    "NEXT_PUBLIC_SITE_URL": "https://mayurmaslacenter.in"
-  }
+    "NEXT_PUBLIC_SITE_URL": "https://mayurmasalacenter.in"
+  },
+  // Secrets Store bindings: value is fetched at runtime via an async
+  // env.<BINDING>.get() call — see lib/supabaseAdmin.ts.
+  // Replace <your_store_id> with your actual Secrets Store ID from the
+  // Cloudflare dashboard (Secrets Store tab), and make sure a secret named
+  // SUPABASE_SERVICE_ROLE_KEY exists in that store.
+  "secrets_store_secrets": [
+    {
+      "binding": "SUPABASE_SERVICE_ROLE_KEY",
+      "store_id": "5757a4c22dbd4f6c86b84ce9fdcf58bf",
+      "secret_name": "SUPABASE_SERVICE_ROLE_KEY"
+    }
+  ]
 }
