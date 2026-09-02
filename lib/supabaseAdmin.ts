@@ -11,9 +11,23 @@ export function supabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!url || !serviceKey) {
+  if (!url) {
     throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variable."
+      "[supabaseAdmin] NEXT_PUBLIC_SUPABASE_URL is not set. " +
+      "Check your wrangler.jsonc vars block."
+    );
+  }
+
+  if (!serviceKey) {
+    // Detailed message to distinguish "never set" from "not bridged by open-next".
+    // If you see this in Cloudflare logs after setting the secret, it means
+    // cloudflareEnv: true is missing from open-next.config.ts — the secret
+    // exists on the Worker env binding but isn't reaching process.env.
+    throw new Error(
+      "[supabaseAdmin] SUPABASE_SERVICE_ROLE_KEY is not set. " +
+      "Run: npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY\n" +
+      "Then verify open-next.config.ts has `cloudflareEnv: true` so the " +
+      "secret is bridged from the Worker binding into process.env."
     );
   }
 

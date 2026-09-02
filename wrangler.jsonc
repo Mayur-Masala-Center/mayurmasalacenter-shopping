@@ -8,6 +8,19 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": false,
+      "head_sampling_rate": 1,
+      "persist": true
+    }
+  },
   // Non-secret vars live here so they're committed and stable across every
   // deploy. Wrangler treats this "vars" block as the full source of truth —
   // anything set only via the dashboard (and not listed here) gets wiped
