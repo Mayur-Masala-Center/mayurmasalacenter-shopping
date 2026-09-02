@@ -24,7 +24,16 @@ function supabase() {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    let body: any;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: "invalid_json" }, { status: 400 });
+    }
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "invalid_body" }, { status: 400 });
+    }
+
     const {
       name,
       phone,
@@ -36,6 +45,19 @@ export async function POST(req: NextRequest) {
       items,
       honeypot,
     } = body;
+
+    // Guard against missing/non-string required fields before they hit
+    // validateCheckout, which calls .trim() on them and would otherwise
+    // throw a TypeError (surfacing as an opaque 500) instead of a clean 400.
+    const requiredStrings = { name, phone, address_line1, pincode, city };
+    for (const [key, value] of Object.entries(requiredStrings)) {
+      if (typeof value !== "string") {
+        return NextResponse.json(
+          { error: "validation_failed", details: { [key]: "This field is required." } },
+          { status: 400 }
+        );
+      }
+    }
 
     // --- Authoritative pincode check -----------------------------------
     // Never trust the city/state the client sent. Re-verify the pincode
@@ -73,7 +95,23 @@ export async function POST(req: NextRequest) {
     );
 
     const client = supabase();
-    const admin = supabaseAdmin();
+
+    // The service-role client is only needed for two best-effort steps below
+    // (reading site_settings with certainty, and auto-generating the bill).
+    // If SUPABASE_SERVICE_ROLE_KEY isn't configured in this environment,
+    // don't let that take down order creation entirely — log it clearly and
+    // degrade gracefully instead. (The DB trigger from migration 010 also
+    // independently recomputes delivery_charge/total server-side, so pricing
+    // integrity doesn't depend on this succeeding.)
+    let admin: ReturnType<typeof supabaseAdmin> | null = null;
+    try {
+      admin = supabaseAdmin();
+    } catch (adminInitErr) {
+      console.error(
+        "supabaseAdmin unavailable — SUPABASE_SERVICE_ROLE_KEY is likely missing from this deployment's env vars",
+        adminInitErr
+      );
+    }
 
     // --- Delivery zone + charge (server-resolved, never client-trusted) --
     const resolvedCity = pincodeResult.city || city;
@@ -81,12 +119,16 @@ export async function POST(req: NextRequest) {
     const zoneKey = resolveDeliveryZone(resolvedCity, resolvedState);
 
     let zoneSettings: DeliveryZoneSettings = DEFAULT_DELIVERY_ZONES;
-    const { data: zoneRow } = await admin
-      .from("site_settings")
-      .select("value")
-      .eq("key", "delivery_zones")
-      .maybeSingle();
-    if (zoneRow?.value) zoneSettings = zoneRow.value as DeliveryZoneSettings;
+    try {
+      const { data: zoneRow } = await (admin ?? client)
+        .from("site_settings")
+        .select("value")
+        .eq("key", "delivery_zones")
+        .maybeSingle();
+      if (zoneRow?.value) zoneSettings = zoneRow.value as DeliveryZoneSettings;
+    } catch (zoneErr) {
+      console.error("delivery zone settings lookup failed, using defaults", zoneErr);
+    }
 
     const deliveryCharge = getZoneCharge(zoneSettings, zoneKey);
     const total = subtotal + deliveryCharge;
@@ -136,6 +178,7 @@ export async function POST(req: NextRequest) {
     // the very first "Order Received" message — can include the bill link.
     // Failure here should never block order placement, so it's best-effort.
     try {
+      if (!admin) throw new Error("admin client unavailable, skipping auto bill");
       const pdfBytes = await generateBillPdfBytes(order);
       const path = `${order.id}/${Date.now()}-bill.pdf`;
 
@@ -161,7 +204,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ order });
   } catch (e) {
-    console.error("order route error", e);
+    console.error(
+      "order route error",
+      e instanceof Error ? { message: e.message, stack: e.stack } : e
+    );
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
 }

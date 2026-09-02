@@ -7,5 +7,25 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
+  },
+  // Non-secret vars live here so they're committed and stable across every
+  // deploy. Wrangler treats this "vars" block as the full source of truth —
+  // anything set only via the dashboard (and not listed here) gets wiped
+  // out on the next `wrangler deploy` / Git-triggered build.
+  //
+  // NEXT_PUBLIC_SUPABASE_ANON_KEY is safe to commit: it's already shipped
+  // to every browser via the client bundle, so it isn't a secret.
+  //
+  // SUPABASE_SERVICE_ROLE_KEY must NOT go here — it stays a real secret,
+  // set with `npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY`, which
+  // persists independently of this file and is never committed to git.
+  "vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://deushocizdaglyjpflsi.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRldXNob2NpemRhZ2x5anBmbHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNzE4OTcsImV4cCI6MjA5ODc0Nzg5N30.T-F2maZxRjdEum9LrNTpz6DaRhlV3D4TK3CEcNUvu60",
+    "NEXT_PUBLIC_SHOP_WHATSAPP": "9225350448",
+    "NEXT_PUBLIC_SHOP_NAME": "Mayur Masala and Pooja Center",
+    "NEXT_PUBLIC_SHOP_ADDRESS": "Shagun Chowk, Pimpri, Pune, Maharashtra",
+    "NEXT_PUBLIC_SHOP_PHONE": "9225350448",
+    "NEXT_PUBLIC_SITE_URL": "https://mayurmaslacenter.in"
   }
 }
