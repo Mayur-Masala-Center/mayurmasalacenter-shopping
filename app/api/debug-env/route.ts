@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// TEMPORARY diagnostic route — DELETE THIS FILE after confirming the fix works.
-// Hit GET /api/debug-env to see which env vars are visible to the Worker.
-// This never logs the actual key value, only whether it is present/absent.
+// TEMPORARY — delete after confirming SUPABASE_SERVICE_ROLE_KEY is present.
+// This endpoint is safe: it never logs the actual key value, only ✅/❌.
+// Hit GET /api/debug-env after deploying to diagnose the RLS issue.
 export async function GET(_req: NextRequest) {
   return NextResponse.json({
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -12,8 +12,7 @@ export async function GET(_req: NextRequest) {
       ? "✅ present"
       : "❌ MISSING",
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY
-      ? "✅ present"
-      : "❌ MISSING — this is your RLS problem",
-    NODE_ENV: process.env.NODE_ENV ?? "(not set)",
+      ? "✅ present — RLS bypass will work"
+      : "❌ MISSING — this is your RLS problem. Run: npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY",
   });
 }
