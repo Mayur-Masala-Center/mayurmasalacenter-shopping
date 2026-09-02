@@ -103,9 +103,9 @@ export async function POST(req: NextRequest) {
     // degrade gracefully instead. (The DB trigger from migration 010 also
     // independently recomputes delivery_charge/total server-side, so pricing
     // integrity doesn't depend on this succeeding.)
-    let admin: Awaited<ReturnType<typeof supabaseAdmin>> | null = null;
+    let admin: ReturnType<typeof supabaseAdmin> | null = null;
     try {
-      admin = await supabaseAdmin();
+      admin = supabaseAdmin();
     } catch (adminInitErr) {
       console.error(
         "supabaseAdmin unavailable — SUPABASE_SERVICE_ROLE_KEY is likely missing from this deployment's env vars",
@@ -142,28 +142,45 @@ export async function POST(req: NextRequest) {
     const orderNumber =
       orderNumberData || `MM-${Date.now().toString().slice(-8)}`;
 
-    const { data, error } = await client
-      .from("orders")
-      .insert({
-        order_number: orderNumber,
-        customer_name: name.trim(),
-        phone: normalizePhone(phone),
-        is_whatsapp: true,
-        address_line1: address_line1.trim(),
-        address_line2: address_line2?.trim() || null,
-        pincode: pincodeStr,
-        city: resolvedCity.trim(),
-        state: resolvedState.trim(),
-        items,
-        subtotal,
-        delivery_charge: deliveryCharge,
-        delivery_zone: zoneKey,
-        total,
-        status: "received",
-        payment_received: false,
-      })
-      .select()
-      .single();
+    const orderPayload = {
+      order_number: orderNumber,
+      customer_name: name.trim(),
+      phone: normalizePhone(phone),
+      is_whatsapp: true,
+      address_line1: address_line1.trim(),
+      address_line2: address_line2?.trim() || null,
+      pincode: pincodeStr,
+      city: resolvedCity.trim(),
+      state: resolvedState.trim(),
+      items,
+      subtotal,
+      delivery_charge: deliveryCharge,
+      delivery_zone: zoneKey,
+      total,
+      status: "received",
+      payment_received: false,
+    };
+
+    // Insert via the service-role client. Migration 008 removed anonymous
+    // SELECT on `orders`, and `.select().single()` after an insert asks
+    // PostgREST to RETURNING the row — which Postgres evaluates against the
+    // SELECT policy, not just INSERT's WITH CHECK. Using the anon client here
+    // caused the insert to actually succeed but the RETURNING to be blocked,
+    // surfacing as the same "violates row-level security policy" error as a
+    // genuine insert failure. The DB trigger from migration 010 still applies
+    // regardless of which client/role performs the insert, so this doesn't
+    // weaken any server-side validation.
+    let data, error;
+    if (admin) {
+      ({ data, error } = await admin.from("orders").insert(orderPayload).select().single());
+    } else {
+      // Degraded fallback: admin client unavailable in this environment.
+      // Anon insert still works (WITH CHECK allows it), but we can't read
+      // the row back, so we build the returned object from what we already
+      // know instead of chaining .select().
+      ({ error } = await client.from("orders").insert(orderPayload));
+      data = error ? null : { id: undefined, ...orderPayload };
+    }
 
     if (error) {
       console.error("order insert error", error);
