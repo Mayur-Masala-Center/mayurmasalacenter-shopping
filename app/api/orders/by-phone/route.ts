@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   const phone = normalizePhone(phoneParam);
 
   try {
-    const supabase = await supabaseAdmin();
+    const supabase = supabaseAdmin();
     const { data, error } = await supabase
       .from("orders")
       .select("id, order_number, status, total, delivery_charge, created_at, payment_received, bill_url")

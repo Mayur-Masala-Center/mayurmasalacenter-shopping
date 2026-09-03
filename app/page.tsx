@@ -5,6 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import CartDrawer from "@/components/CartDrawer";
 import GoogleReviews from "@/components/GoogleReviews";
 import { getActiveProducts, getSiteSettings, getFeaturedReviews } from "@/lib/data";
+import { slugify } from "@/lib/slug";
 
 export const revalidate = 30;
 
@@ -76,7 +77,12 @@ export default async function HomePage() {
             if (items.length === 0) return null;
             return (
               <div key={cat} className="mb-12">
-                <h3 className="text-lg font-semibold text-vermillion-500 mb-4 capitalize">{cat}</h3>
+                <a href={`/category/${slugify(cat)}`} className="group inline-flex items-center gap-2 mb-4">
+                  <h3 className="text-lg font-semibold text-vermillion-500 capitalize group-hover:underline">
+                    {cat}
+                  </h3>
+                  <span className="text-xs text-vermillion-500/70">View all →</span>
+                </a>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
                   {items.map((product) => (
                     <ProductCard key={product.id} product={product} />

@@ -24,6 +24,11 @@ export async function getActiveProducts(): Promise<Product[]> {
   return data as Product[];
 }
 
+export async function getActiveCategories(): Promise<string[]> {
+  const products = await getActiveProducts();
+  return Array.from(new Set(products.map((p) => p.category || "General")));
+}
+
 export async function getFeaturedReviews(): Promise<Review[]> {
   const supabase = serverClient();
   const { data, error } = await supabase

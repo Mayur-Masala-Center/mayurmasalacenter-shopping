@@ -71,6 +71,23 @@ export function formatOrderAddress(order: Order): string {
   return order.address || "";
 }
 
+// Masks the street-level part of the address for customer-facing display
+// (e.g. the public tracking page), while still showing city/state so the
+// customer can confirm the order is theirs. Each masked line is replaced
+// with a fixed run of asterisks rather than mirroring the original length,
+// so the redaction itself doesn't leak how much text was there.
+export function formatOrderAddressMasked(order: Order): string {
+  const maskedLines = [order.address_line1, order.address_line2]
+    .filter(Boolean)
+    .map(() => "***");
+
+  const cityState = [order.city, order.state].filter(Boolean).join(", ");
+
+  const parts = [...maskedLines, cityState].filter(Boolean);
+  if (parts.length > 0) return parts.join(", ");
+  return order.address ? "***" : "";
+}
+
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   received: "Order Received",
   processing: "Processing",
