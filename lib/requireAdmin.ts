@@ -14,7 +14,7 @@ export async function requireAdmin(req: NextRequest) {
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
   if (!token) return null;
 
-  const supabase = supabaseAdmin();
+  const supabase = await supabaseAdmin();
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data.user) return null;
 

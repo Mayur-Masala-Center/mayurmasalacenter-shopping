@@ -17,7 +17,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   try {
-    const supabase = supabaseAdmin();
+    const supabase = await supabaseAdmin();
     const { data, error } = await supabase.from("orders").select("*").eq("id", id).single();
 
     if (error || !data) {

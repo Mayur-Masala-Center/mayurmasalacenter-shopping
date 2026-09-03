@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "missing_order_id" }, { status: 400 });
     }
 
-    const supabase = supabaseAdmin();
+    const supabase = await supabaseAdmin();
 
     const { data: order, error: orderError } = await supabase
       .from("orders")
