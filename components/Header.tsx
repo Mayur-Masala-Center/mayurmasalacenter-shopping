@@ -26,7 +26,9 @@ export default function Header() {
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
           <a href="#shop" className="hover:text-turmeric-300 transition-colors">Shop</a>
+          <a href="#festivals" className="hover:text-turmeric-300 transition-colors">Festival Decor</a>
           <a href="#about" className="hover:text-turmeric-300 transition-colors">Our Story</a>
+          <a href="#faq" className="hover:text-turmeric-300 transition-colors">FAQs</a>
           <Link href="/track" className="hover:text-turmeric-300 transition-colors">Track Order</Link>
         </nav>
 

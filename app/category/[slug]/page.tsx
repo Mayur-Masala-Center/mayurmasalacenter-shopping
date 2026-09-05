@@ -12,6 +12,32 @@ export const revalidate = 30;
 
 const SITE_URL = "https://mayurmasalacenter.in";
 
+const SERVICE_AREAS = ["Pimpri", "PCMC", "Chinchwad", "Pune"];
+
+const FESTIVAL_CATEGORY_HINTS: Record<string, string> = {
+  ganpati: "Ganesh Chaturthi",
+  ganesh: "Ganesh Chaturthi",
+  gokulashtami: "Gokulashtami/Janmashtami",
+  janmashtami: "Gokulashtami/Janmashtami",
+  diwali: "Diwali",
+  decor: "festival",
+  decoration: "festival",
+};
+
+function buildCategoryIntro(category: string, shopName: string): string {
+  const lower = category.toLowerCase();
+  const festivalKey = Object.keys(FESTIVAL_CATEGORY_HINTS).find((k) => lower.includes(k));
+
+  if (festivalKey) {
+    const occasion = FESTIVAL_CATEGORY_HINTS[festivalKey];
+    return `Shop ${category} at ${shopName} — quality ${occasion} decoration items and pooja essentials, delivered across Pimpri, PCMC and Pune. Trusted by local families since 1992.`;
+  }
+  if (lower.includes("pooja") || lower.includes("samagri")) {
+    return `Complete ${category} for your daily pooja and special occasions, sourced fresh at ${shopName}. Serving Pimpri, Chinchwad and Pune since 1992 with reliable home delivery.`;
+  }
+  return `Fresh, aromatic ${category.toLowerCase()} ground and packed at ${shopName} — Pimpri and PCMC's trusted spice store since 1992. Order online with home delivery across Pune.`;
+}
+
 interface Props {
   params: Promise<{ slug: string }>;
 }
@@ -37,8 +63,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!data) return {};
 
   const shopName = process.env.NEXT_PUBLIC_SHOP_NAME || "Mayur Masala and Pooja Center";
-  const title = `${data.category} | ${shopName}, Pimpri`;
-  const description = `Shop ${data.category} at ${shopName} — Pimpri's trusted masala and pooja samagri store since 1992. Fresh stock, home delivery, cash on delivery.`;
+  const title = `${data.category} in Pimpri, PCMC & Pune | ${shopName}`;
+  const description = buildCategoryIntro(data.category, shopName);
   const url = `${SITE_URL}/category/${slug}`;
 
   return {
@@ -95,6 +121,22 @@ export default async function CategoryPage({ params }: Props) {
     },
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: data.category,
+        item: `${SITE_URL}/category/${slug}`,
+      },
+    ],
+  };
+
+  const categoryIntro = buildCategoryIntro(data.category, shopName);
+
   return (
     <>
       <Header />
@@ -104,6 +146,10 @@ export default async function CategoryPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
@@ -115,11 +161,11 @@ export default async function CategoryPage({ params }: Props) {
         </nav>
 
         <h1 className="font-display text-3xl text-tamarind-900 mb-2 capitalize">
-          {data.category}
+          {data.category} — Pimpri, PCMC &amp; Pune
         </h1>
-        <p className="text-tamarind-800/70 text-sm mb-8 max-w-2xl">
-          Browse our {data.category.toLowerCase()} range at {shopName}, Pimpri&apos;s trusted
-          masala and pooja samagri store since 1992.
+        <p className="text-tamarind-800/70 text-sm mb-8 max-w-2xl">{categoryIntro}</p>
+        <p className="text-xs text-tamarind-800/50 mb-8 -mt-6 max-w-2xl">
+          Delivering to {SERVICE_AREAS.join(", ")} and nearby areas.
         </p>
 
         {data.allCategories.length > 1 && (

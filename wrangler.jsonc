@@ -39,7 +39,9 @@
     "NEXT_PUBLIC_SHOP_NAME": "Mayur Masala and Pooja Center",
     "NEXT_PUBLIC_SHOP_ADDRESS": "Shagun Chowk, Pimpri, Pune, Maharashtra",
     "NEXT_PUBLIC_SHOP_PHONE": "9225350448",
-    "NEXT_PUBLIC_SITE_URL": "https://mayurmasalacenter.in"
+    "NEXT_PUBLIC_SITE_URL": "https://mayurmasalacenter.in",
+    "NEXT_PUBLIC_GOOGLE_MAPS_URL":"https://maps.app.goo.gl/fgkdy4AxJjMUVLGDA",
+    "NEXT_PUBLIC_SHOP_INSTAGRAM": "https://www.instagram.com/mayurmasalacenter/"
   },
   // Secrets Store bindings: value is fetched at runtime via an async
   // env.<BINDING>.get() call — see lib/supabaseAdmin.ts.
