@@ -12,7 +12,7 @@ export const revalidate = 30;
 
 const SITE_URL = "https://mayurmasalacenter.in";
 
-const SERVICE_AREAS = ["Pimpri", "PCMC", "Chinchwad", "Pune"];
+const SERVICE_AREAS = ["Pimpri", "PCMC", "Chinchwad", "Pune","Moshi","Chakan","Bhosari","Akurdi","Nigdi","Wakad","Hinjewadi"];
 
 const FESTIVAL_CATEGORY_HINTS: Record<string, string> = {
   ganpati: "Ganesh Chaturthi",
@@ -102,22 +102,27 @@ export default async function CategoryPage({ params }: Props) {
     url: `${SITE_URL}/category/${slug}`,
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: data.items.map((p, idx) => ({
-        "@type": "ListItem",
-        position: idx + 1,
-        item: {
-          "@type": "Product",
-          name: p.name,
-          image: p.image_url || undefined,
-          description: p.description || undefined,
-          offers: {
-            "@type": "Offer",
-            price: p.price,
-            priceCurrency: "INR",
-            availability: "https://schema.org/InStock",
+      // Only emit full Product markup when we have the fields Google's
+      // Product-snippet validator requires (name, image, priced offer).
+      // Items missing an image or price would otherwise be flagged invalid.
+      itemListElement: data.items
+        .filter((p) => p.image_url && p.price)
+        .map((p, idx) => ({
+          "@type": "ListItem",
+          position: idx + 1,
+          item: {
+            "@type": "Product",
+            name: p.name,
+            image: p.image_url,
+            description: p.description || undefined,
+            offers: {
+              "@type": "Offer",
+              price: p.price,
+              priceCurrency: "INR",
+              availability: "https://schema.org/InStock",
+            },
           },
-        },
-      })),
+        })),
     },
   };
 

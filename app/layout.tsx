@@ -14,7 +14,7 @@ const SHOP_LNG = process.env.NEXT_PUBLIC_SHOP_LNG || "73.8015853";
 const GOOGLE_MAPS_URL =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_URL ||
   "https://www.google.com/maps/place/Mayur+Masala+Center+and+Pooja+Bhandar/@18.6223338,73.649168,12z/data=!4m6!3m5!1s0x3bc2b9c64ee491bd:0x1b2772fad6e477e1!8m2!3d18.6223157!4d73.8015853";
-const SHOP_INSTAGRAM = process.env.NEXT_PUBLIC_SHOP_INSTAGRAM || "";
+const SHOP_INSTAGRAM = process.env.NEXT_PUBLIC_SHOP_INSTAGRAM || "https://www.instagram.com/mayurmasalacenter/";
 const SHOP_FACEBOOK = process.env.NEXT_PUBLIC_SHOP_FACEBOOK || "";
 
 const TITLE =
@@ -117,14 +117,6 @@ export default function RootLayout({
       opens: "09:00",
       closes: "21:00",
     },
-    makesOffer: [
-      { "@type": "Offer", itemOffered: { "@type": "Product", name: "Fresh ground masalas" } },
-      { "@type": "Offer", itemOffered: { "@type": "Product", name: "Pooja samagri" } },
-      {
-        "@type": "Offer",
-        itemOffered: { "@type": "Product", name: "Festival decoration items (Ganpati, Gokulashtami, Diwali)" },
-      },
-    ],
   };
 
   const websiteJsonLd = {
